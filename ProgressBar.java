@@ -10,6 +10,7 @@ public abstract class ProgressBar extends JComponent {
 
     public abstract int getProgress(int width);
     public abstract String getLegend();
+    public abstract void saveToFile(String filename);
 
     @Override
     public void paint(Graphics g) {

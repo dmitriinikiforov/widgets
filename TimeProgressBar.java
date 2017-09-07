@@ -1,8 +1,8 @@
 package com.github.dmitriinikiforov.widgets;
 
-import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.io.*;
 import java.time.LocalDate;
 
 /**
@@ -26,6 +26,25 @@ public class TimeProgressBar extends ProgressBar {
         this.setMaximumSize(new Dimension(600,80));
         this.setBorder(new LineBorder(Color.green,1));
     }
+    public TimeProgressBar(String filename) {
+        try {
+            DataInputStream dis = new DataInputStream(new FileInputStream(filename));
+            if (!dis.readUTF().equals(TimeProgressBar.class.getCanonicalName())) {
+                System.err.println("wrong file");
+            }
+            title=dis.readUTF();
+            beginDate=LocalDate.ofEpochDay(dis.readLong());
+            endDate=LocalDate.ofEpochDay(dis.readLong());
+            daysBetween=endDate.toEpochDay()-beginDate.toEpochDay();
+            dis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     public int getProgress(int width) {
@@ -41,6 +60,23 @@ public class TimeProgressBar extends ProgressBar {
         long daysRemain=endDate.toEpochDay()-today.toEpochDay();
         return new StringBuffer(title).append(": ").append(daysRemain).
                 append(" (").append(daysPassed).append("/").append(daysBetween).append(")").toString();
+    }
+
+    @Override
+    public void saveToFile(String filename) {
+        try {
+            DataOutputStream dos=new DataOutputStream(new FileOutputStream(filename));
+            dos.writeUTF(this.getClass().getCanonicalName());
+            dos.writeUTF(title);
+            dos.writeLong(beginDate.toEpochDay());
+            dos.writeLong(endDate.toEpochDay());
+            dos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
