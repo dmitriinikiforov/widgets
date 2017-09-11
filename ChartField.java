@@ -9,6 +9,8 @@ public class ChartField extends Canvas {
     private int width;
     private int height;
     private double[] constraints;
+    private int xTicksNum=10;
+    private double[] Xticks;
     private int borderMargin=10;
     private LinkedList<BufferedImage> plots;
     public ChartField() {
@@ -38,6 +40,18 @@ public class ChartField extends Canvas {
         bufG.drawString(String.format("%.2f",constraints[1]),width-borderMargin,height);
         bufG.drawString(String.format("%.2f",constraints[2]),0,height-borderMargin);
         bufG.drawString(String.format("%.2f",constraints[3]),0,borderMargin);
+
+        int xTicksStep=(width-2*borderMargin)/(xTicksNum-1);
+        Xticks=new double[xTicksNum];
+        for (int i=1; i<xTicksNum; i++) {
+            bufG.setColor(Color.lightGray);
+            bufG.drawLine(borderMargin+i*xTicksStep,borderMargin,
+                    borderMargin+i*xTicksStep,height-borderMargin);
+            Xticks[i-1]=constraints[0]+i*(constraints[1]-constraints[0])/xTicksNum;
+            bufG.setColor(Color.BLUE);
+            bufG.drawString(String.format("%.2f",Xticks[i-1]),borderMargin+i*xTicksStep,height);
+        }
+
         g.drawImage(buffer,0,0,null);
 
         for (BufferedImage img: plots) {
