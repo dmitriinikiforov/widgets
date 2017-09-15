@@ -9,8 +9,8 @@ public class ChartField extends Canvas {
     private int width;
     private int height;
     private double[] constraints;
-    private int xTicksNum=10;
-    private double[] Xticks;
+    private int xTicksNum=9;
+    private int yTicksNum=5;
     private int borderMargin=10;
     private LinkedList<BufferedImage> plots;
     public ChartField() {
@@ -41,21 +41,29 @@ public class ChartField extends Canvas {
         bufG.drawString(String.format("%.2f",constraints[2]),0,height-borderMargin);
         bufG.drawString(String.format("%.2f",constraints[3]),0,borderMargin);
 
-        int xTicksStep=(width-2*borderMargin)/(xTicksNum-1);
-        Xticks=new double[xTicksNum];
-        for (int i=1; i<xTicksNum; i++) {
+        double[] xTicks=new double[xTicksNum];
+        for (int i=1; i<xTicksNum+1; i++) {
             bufG.setColor(Color.lightGray);
-            bufG.drawLine(borderMargin+i*xTicksStep,borderMargin,
-                    borderMargin+i*xTicksStep,height-borderMargin);
-            Xticks[i-1]=constraints[0]+i*(constraints[1]-constraints[0])/xTicksNum;
+            bufG.drawLine(borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),borderMargin+1,
+                    borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),height-borderMargin-1);
+            xTicks[i-1]=constraints[0]+i*(constraints[1]-constraints[0])/(xTicksNum+1);
             bufG.setColor(Color.BLUE);
-            bufG.drawString(String.format("%.2f",Xticks[i-1]),borderMargin+i*xTicksStep,height);
+            bufG.drawString(String.format("%.2f",xTicks[i-1]),borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),height);
+        }
+        double[] yTicks=new double[yTicksNum];
+        for (int i=1; i<yTicksNum+1; i++) {
+            bufG.setColor(Color.lightGray);
+            bufG.drawLine(borderMargin+1,borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)),
+                    width-borderMargin-1, borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)));
+            yTicks[i-1]=constraints[2]+i*(constraints[3]-constraints[2])/(yTicksNum+1);
+            bufG.setColor(Color.BLUE);
+            bufG.drawString(String.format("%.2f",yTicks[yTicksNum-i]),0,borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)));
         }
 
         g.drawImage(buffer,0,0,null);
 
         for (BufferedImage img: plots) {
-            g.drawImage(img,borderMargin,borderMargin,null);
+            g.drawImage(img,borderMargin+1,borderMargin+1,null);
         }
     }
 
@@ -72,6 +80,8 @@ public class ChartField extends Canvas {
 
         double[] sortedX=Arrays.copyOf(xData,n);
         double[] sortedY=Arrays.copyOf(yData,n);
+        Arrays.sort(sortedX);
+        Arrays.sort(sortedY);
         double minX=sortedX[0];
         double maxX=sortedX[n-1];
         double minY=sortedY[0];
@@ -81,7 +91,7 @@ public class ChartField extends Canvas {
         if (minY<constraints[2]) constraints[2]=minY;
         if (maxY>constraints[3]) constraints[3]=maxY;
 
-        plots.add(plotLine(new Dimension(width-2*borderMargin,height-2*borderMargin),constraints,xData,yData));
+        plots.add(plotLine(new Dimension(width-2*borderMargin-2,height-2*borderMargin-2),constraints,xData,yData));
         repaint();
     }
 
@@ -91,10 +101,10 @@ public class ChartField extends Canvas {
         int n=xData.length;
         g.setColor(Color.green);
         for (int i=0; i<n-1; i++) {
-            g.drawLine((int)(dim.width*(constraints[1]-xData[i])/(constraints[1]-constraints[0])),
-                    (int)(dim.height*((constraints[3]-yData[i])/(constraints[3]-constraints[2]))),
-                    (int)(dim.width*(constraints[1]-xData[i+1])/(constraints[1]-constraints[0])),
-                    (int)(dim.height*((constraints[3]-yData[i+1])/(constraints[3]-constraints[2]))));
+            g.drawLine((int)(Math.round(dim.width*(constraints[1]-xData[i])/(constraints[1]-constraints[0]))),
+                    (int)(Math.round(dim.height*(constraints[3]-yData[i])/(constraints[3]-constraints[2]))),
+                    (int)(Math.round(dim.width*(constraints[1]-xData[i+1])/(constraints[1]-constraints[0]))),
+                    (int)(Math.round(dim.height*(constraints[3]-yData[i+1])/(constraints[3]-constraints[2]))));
         }
         return img;
     }
