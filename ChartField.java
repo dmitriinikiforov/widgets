@@ -57,7 +57,7 @@ public class ChartField extends Canvas {
                     width-borderMargin-1, borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)));
             yTicks[i-1]=constraints[2]+i*(constraints[3]-constraints[2])/(yTicksNum+1);
             bufG.setColor(Color.BLUE);
-            bufG.drawString(String.format("%.2f",yTicks[yTicksNum-i]),0,borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)));
+            bufG.drawString(String.format("%.2f",yTicks[i-1]),0,borderMargin+(int)((yTicksNum-i+1)*(height-2*borderMargin)*1.0/(yTicksNum+1)));
         }
 
         g.drawImage(buffer,0,0,null);
