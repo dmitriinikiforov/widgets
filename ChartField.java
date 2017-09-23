@@ -31,39 +31,47 @@ public class ChartField extends Canvas {
 
         BufferedImage buffer=new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
         Graphics bufG=buffer.getGraphics();
-        bufG.setColor(Color.white);
-        bufG.fillRect(0,0,width,height);
-        bufG.setColor(Color.black);
-        bufG.drawRect(borderMargin,borderMargin,width-2*borderMargin,height-2*borderMargin);
-        bufG.setColor(Color.BLUE);
-        bufG.drawString(String.format("%.2f",constraints[0]),borderMargin,height);
-        bufG.drawString(String.format("%.2f",constraints[1]),width-borderMargin,height);
-        bufG.drawString(String.format("%.2f",constraints[2]),0,height-borderMargin);
-        bufG.drawString(String.format("%.2f",constraints[3]),0,borderMargin);
 
-        double[] xTicks=new double[xTicksNum];
-        for (int i=1; i<xTicksNum+1; i++) {
-            bufG.setColor(Color.lightGray);
-            bufG.drawLine(borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),borderMargin+1,
-                    borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),height-borderMargin-1);
-            xTicks[i-1]=constraints[0]+i*(constraints[1]-constraints[0])/(xTicksNum+1);
-            bufG.setColor(Color.BLUE);
-            bufG.drawString(String.format("%.2f",xTicks[i-1]),borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),height);
-        }
-        double[] yTicks=new double[yTicksNum];
-        for (int i=1; i<yTicksNum+1; i++) {
-            bufG.setColor(Color.lightGray);
-            bufG.drawLine(borderMargin+1,borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)),
-                    width-borderMargin-1, borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)));
-            yTicks[i-1]=constraints[2]+i*(constraints[3]-constraints[2])/(yTicksNum+1);
-            bufG.setColor(Color.BLUE);
-            bufG.drawString(String.format("%.2f",yTicks[i-1]),0,borderMargin+(int)((yTicksNum-i+1)*(height-2*borderMargin)*1.0/(yTicksNum+1)));
-        }
+        drawBorder(bufG);
+        drawSecondaryAxes(bufG);
 
         g.drawImage(buffer,0,0,null);
 
         for (BufferedImage img: plots) {
             g.drawImage(img,borderMargin+1,borderMargin+1,null);
+        }
+    }
+
+    private void drawBorder(Graphics g) {
+        g.setColor(Color.white);
+        g.fillRect(0,0,width,height);
+        g.setColor(Color.black);
+        g.drawRect(borderMargin,borderMargin,width-2*borderMargin,height-2*borderMargin);
+        g.setColor(Color.BLUE);
+        g.drawString(String.format("%.2f",constraints[0]),borderMargin,height);
+        g.drawString(String.format("%.2f",constraints[1]),width-borderMargin,height);
+        g.drawString(String.format("%.2f",constraints[2]),0,height-borderMargin);
+        g.drawString(String.format("%.2f",constraints[3]),0,borderMargin);
+    }
+
+    private void drawSecondaryAxes(Graphics g) {
+        double[] xTicks=new double[xTicksNum];
+        for (int i=1; i<xTicksNum+1; i++) {
+            g.setColor(Color.lightGray);
+            g.drawLine(borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),borderMargin+1,
+                    borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),height-borderMargin-1);
+            xTicks[i-1]=constraints[0]+i*(constraints[1]-constraints[0])/(xTicksNum+1);
+            g.setColor(Color.BLUE);
+            g.drawString(String.format("%.2f",xTicks[i-1]),borderMargin+(int)(i*(width-2*borderMargin)*1.0/(xTicksNum+1)),height);
+        }
+        double[] yTicks=new double[yTicksNum];
+        for (int i=1; i<yTicksNum+1; i++) {
+            g.setColor(Color.lightGray);
+            g.drawLine(borderMargin+1,borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)),
+                    width-borderMargin-1, borderMargin+(int)(i*(height-2*borderMargin)*1.0/(yTicksNum+1)));
+            yTicks[i-1]=constraints[2]+i*(constraints[3]-constraints[2])/(yTicksNum+1);
+            g.setColor(Color.BLUE);
+            g.drawString(String.format("%.2f",yTicks[i-1]),0,borderMargin+(int)((yTicksNum-i+1)*(height-2*borderMargin)*1.0/(yTicksNum+1)));
         }
     }
 
