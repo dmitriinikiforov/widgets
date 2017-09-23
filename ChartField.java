@@ -2,7 +2,9 @@ package com.github.dmitriinikiforov.widgets;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class ChartField extends Canvas {
@@ -12,14 +14,16 @@ public class ChartField extends Canvas {
     private int xTicksNum=9;
     private int yTicksNum=5;
     private int borderMargin=10;
-    private LinkedList<BufferedImage> plots;
+    private ArrayList<ChartData> charts;
     public ChartField() {
-        plots=new LinkedList<>();
+        width=getWidth();
+        height=getHeight();
         constraints=new double[4];
         constraints[0]=-1.0;
         constraints[1]=1.0;
         constraints[2]=-1.0;
         constraints[3]=1.0;
+        charts=new ArrayList<>();
         repaint();
     }
     @Override
@@ -37,7 +41,9 @@ public class ChartField extends Canvas {
 
         g.drawImage(buffer,0,0,null);
 
-        for (BufferedImage img: plots) {
+        BufferedImage img;
+        for (ChartData cData: charts) {
+            img=cData.drawChart(new Dimension(width-2*borderMargin-2,height-2*borderMargin-2),constraints);
             g.drawImage(img,borderMargin+1,borderMargin+1,null);
         }
     }
@@ -76,16 +82,11 @@ public class ChartField extends Canvas {
     }
 
     public void addLinePlot(double[] xData, double[] yData) {
-        if (width==0 || height==0){
-            System.err.println("width "+width+" height "+height);
-            return;
-        }
         int n=xData.length;
         if (n!=yData.length) {
             System.err.println("x and y data has different lengths");
             return;
         }
-
         double[] sortedX=Arrays.copyOf(xData,n);
         double[] sortedY=Arrays.copyOf(yData,n);
         Arrays.sort(sortedX);
@@ -99,21 +100,8 @@ public class ChartField extends Canvas {
         if (minY<constraints[2]) constraints[2]=minY;
         if (maxY>constraints[3]) constraints[3]=maxY;
 
-        plots.add(plotLine(new Dimension(width-2*borderMargin-2,height-2*borderMargin-2),constraints,xData,yData));
-        repaint();
-    }
+        charts.add(new LineChartData(xData,yData));
 
-    private BufferedImage plotLine(Dimension dim, double[] constraints, double[] xData, double[] yData) {
-        BufferedImage img=new BufferedImage(dim.width,dim.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics g=img.getGraphics();
-        int n=xData.length;
-        g.setColor(Color.green);
-        for (int i=0; i<n-1; i++) {
-            g.drawLine((int)(Math.round(dim.width*(constraints[1]-xData[i])/(constraints[1]-constraints[0]))),
-                    (int)(Math.round(dim.height*(constraints[3]-yData[i])/(constraints[3]-constraints[2]))),
-                    (int)(Math.round(dim.width*(constraints[1]-xData[i+1])/(constraints[1]-constraints[0]))),
-                    (int)(Math.round(dim.height*(constraints[3]-yData[i+1])/(constraints[3]-constraints[2]))));
-        }
-        return img;
+        repaint();
     }
 }
